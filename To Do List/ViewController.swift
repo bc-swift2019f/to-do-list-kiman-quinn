@@ -14,14 +14,27 @@ class ViewController: UIViewController {
     @IBOutlet weak var editBarButton: UIBarButtonItem!
     @IBOutlet weak var addBarbutton: UIBarButtonItem!
     
-    var toDoArray = ["Learn Swift", "Build Apps", "Change the World!"]
-    var toDoNotesArray = ["This is one note I have", "This is another note I have", "This is the last note I have"]
-    
+    var defaultsData = UserDefaults.standard
+    var toDoArray = [String]()
+    var toDoNotesArray = [String]()
+//    var toDoArray = ["Learn Swift", "Build Apps", "Change the World!"]
+//    var toDoNotesArray = ["This is one note I have", "This is another note I have", "This is the last note I have"]
+//
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.delegate = self
         tableView.dataSource = self
+        
+        toDoArray = defaultsData.stringArray(forKey: "toDoArray") ?? [String]()
+        toDoNotesArray = defaultsData.stringArray(forKey: "toDoNotesArray") ?? [String]()
+        
     }
+    
+    func saveDefaultsData(){
+        defaultsData.set(toDoArray, forKey: "toDoArray")
+        defaultsData.set(toDoNotesArray, forKey: "toDoNotesArray")
+    }
+    
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "editItem"{
             let destination = segue.destination as! DetailViewController
@@ -49,7 +62,7 @@ class ViewController: UIViewController {
             toDoNotesArray.append(sourceViewController.toDoNoteItem!)
             tableView.insertRows(at: [newIndexPath], with: .automatic)
         }
-        
+        saveDefaultsData()
     }
     
     @IBAction func editBarButtonPressed(_ sender: UIBarButtonItem) {
@@ -85,6 +98,7 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
             toDoArray.remove(at: indexPath.row)
             toDoNotesArray.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .fade)
+            saveDefaultsData()
         }
     }
     
@@ -95,6 +109,7 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
         toDoNotesArray.remove(at: sourceIndexPath.row)
         toDoArray.insert(itemToMove, at: destinationIndexPath.row)
         toDoNotesArray.insert(noteToMove, at: destinationIndexPath.row)
+        saveDefaultsData()
     }
     
 }
